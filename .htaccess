@@ -1,0 +1,14 @@
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^thread/([0-9]+)$ index.php?page=thread&id=$1 [L,QSA]
+  RewriteRule ^category/([0-9]+)$ index.php?category=$1 [L,QSA]
+</IfModule>
+
+<FilesMatch "^(config|installed)\.">
+  Require all denied
+</FilesMatch>
+
