@@ -203,8 +203,15 @@ $user = Auth::user();
 $page = (string) ($_GET['page'] ?? 'home');
 $selectedCategory = isset($_GET['category']) ? (int) $_GET['category'] : null;
 $siteName = setting('site_name', config_value($config, 'site.name', 'iForum'));
-$tagline = setting('tagline', 'A clean community forum template.');
+$tagline = setting('tagline', '现代、轻量、可直接部署的 PHP 论坛。');
 $flash = flash();
+
+$productHighlights = [
+    ['ZIP 安装', '上传压缩包，打开 install.php，填数据库即可上线。'],
+    ['无需 Composer', 'PHP 8.1 + PDO MySQL/MariaDB，普通虚拟主机也能跑。'],
+    ['API-first', '内置 JSON API，Web 和 iOS 客户端共享同一套数据。'],
+    ['可运营后台', '管理员可配置站点文案、分类、颜色和社区入口。'],
+];
 
 ?><!doctype html>
 <html lang="zh-CN">
@@ -356,8 +363,8 @@ $flash = flash();
           <input type="hidden" name="action" value="save_settings">
           <label><span>站点名称</span><input name="site_name" value="<?= e($siteName) ?>" required></label>
           <label><span>副标题</span><input name="tagline" value="<?= e($tagline) ?>"></label>
-          <label><span>首页标题</span><input name="welcome_title" value="<?= e(setting('welcome_title', '欢迎来到 iForum')) ?>"></label>
-          <label><span>首页介绍</span><textarea name="welcome_body" rows="4"><?= e(setting('welcome_body', '这是一个通用论坛模板。')) ?></textarea></label>
+          <label><span>首页标题</span><input name="welcome_title" value="<?= e(setting('welcome_title', '让社区论坛像博客程序一样好安装。')) ?>"></label>
+          <label><span>首页介绍</span><textarea name="welcome_body" rows="4"><?= e(setting('welcome_body', 'iForum 面向普通 PHP 空间：上传 zip、填写数据库、创建管理员，然后直接开始运营。')) ?></textarea></label>
           <button class="button primary" type="submit">保存设置</button>
         </form>
       </section>
@@ -384,54 +391,96 @@ $flash = flash();
     </main>
 
   <?php else: ?>
-    <main class="layout">
-      <aside class="sidebar">
-        <section class="intro">
-          <p class="eyebrow">Community Template</p>
-          <h1><?= e(setting('welcome_title', '欢迎来到 iForum')) ?></h1>
-          <p><?= e(setting('welcome_body', '一个干净的通用论坛模板，安装后即可开始运营。')) ?></p>
-          <a class="button primary" href="<?= $user ? 'index.php?page=compose' : 'index.php?page=login' ?>"><?= $user ? '发布主题' : '登录 / 注册' ?></a>
-        </section>
-        <section class="panel stats">
-          <div><strong><?= thread_count() ?></strong><span>主题</span></div>
-          <div><strong><?= post_count() ?></strong><span>回复</span></div>
-        </section>
-        <section class="panel">
-          <h2>分类</h2>
-          <a class="category-link <?= $selectedCategory ? '' : 'active' ?>" href="index.php">全部主题</a>
-          <?php foreach (categories() as $category): ?>
-            <a class="category-link <?= $selectedCategory === (int) $category['id'] ? 'active' : '' ?>" href="index.php?category=<?= (int) $category['id'] ?>">
-              <span class="dot" style="background: <?= e($category['color']) ?>"></span><?= e($category['name']) ?>
-            </a>
-          <?php endforeach; ?>
-        </section>
-      </aside>
-
-      <section class="feed">
-        <div class="section-head">
-          <h2>最新主题</h2>
-          <span><?= thread_count($selectedCategory) ?> 条</span>
+    <main class="home-shell">
+      <section class="product-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">iForum 1.0</p>
+          <h1><?= e(setting('welcome_title', '让社区论坛像博客程序一样好安装。')) ?></h1>
+          <p><?= e(setting('welcome_body', 'iForum 是一个面向普通 PHP 空间的现代论坛模板：上传 zip、填写数据库、创建管理员，然后直接开始运营。')) ?></p>
+          <div class="hero-actions">
+            <a class="button primary" href="<?= $user ? 'index.php?page=compose' : 'index.php?page=login' ?>"><?= $user ? '发布主题' : '登录 / 注册' ?></a>
+            <a class="button ghost" href="api.php?action=site">查看 API</a>
+          </div>
         </div>
-        <?php $threads = all_threads($selectedCategory); ?>
-        <?php if (!$threads): ?>
-          <article class="empty-state">
-            <h3>还没有主题</h3>
-            <p>发布第一条讨论，让这个社区开始运转。</p>
-            <a class="button secondary" href="<?= $user ? 'index.php?page=compose' : 'index.php?page=login' ?>">开始发布</a>
-          </article>
-        <?php endif; ?>
-        <?php foreach ($threads as $thread): ?>
-          <article class="thread-card">
-            <a class="chip" style="--chip: <?= e($thread['category_color']) ?>" href="index.php?category=<?= (int) $thread['category_id'] ?>"><?= e($thread['category_name']) ?></a>
-            <h3><a href="index.php?page=thread&id=<?= (int) $thread['id'] ?>"><?= e($thread['title']) ?></a></h3>
-            <p><?= e(mb_substr(strip_tags($thread['content']), 0, 140)) ?><?= mb_strlen($thread['content']) > 140 ? '...' : '' ?></p>
-            <footer>
-              <span><?= e($thread['display_name']) ?></span>
-              <span><?= e(time_ago($thread['last_activity_at'])) ?></span>
-              <span><?= (int) $thread['reply_count'] ?> 回复</span>
-            </footer>
+        <div class="forum-preview" aria-label="iForum interface preview">
+          <div class="preview-bar"><span></span><span></span><span></span></div>
+          <div class="preview-thread main"></div>
+          <div class="preview-thread"></div>
+          <div class="preview-thread short"></div>
+          <div class="preview-compose">
+            <strong>Typecho 式安装体验</strong>
+            <span>zip -> install.php -> MySQL -> live</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="product-strip">
+        <?php foreach ($productHighlights as $highlight): ?>
+          <article>
+            <strong><?= e($highlight[0]) ?></strong>
+            <span><?= e($highlight[1]) ?></span>
           </article>
         <?php endforeach; ?>
+      </section>
+
+      <section class="community-layout">
+        <aside class="sidebar">
+          <section class="panel stats">
+            <div><strong><?= thread_count() ?></strong><span>主题</span></div>
+            <div><strong><?= post_count() ?></strong><span>回复</span></div>
+          </section>
+          <section class="panel">
+            <h2>讨论分类</h2>
+            <a class="category-link <?= $selectedCategory ? '' : 'active' ?>" href="index.php">全部主题</a>
+            <?php foreach (categories() as $category): ?>
+              <a class="category-link <?= $selectedCategory === (int) $category['id'] ? 'active' : '' ?>" href="index.php?category=<?= (int) $category['id'] ?>">
+                <span class="dot" style="background: <?= e($category['color']) ?>"></span><?= e($category['name']) ?>
+              </a>
+            <?php endforeach; ?>
+          </section>
+        </aside>
+
+        <section class="feed">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow dark">Community</p>
+              <h2>最新主题</h2>
+            </div>
+            <span><?= thread_count($selectedCategory) ?> 条</span>
+          </div>
+          <?php $threads = all_threads($selectedCategory); ?>
+          <?php if (!$threads): ?>
+            <article class="empty-state">
+              <h3>一个清爽的社区已经准备好。</h3>
+              <p>创建第一条讨论，测试分类、登录、回帖和 iOS API 联动。</p>
+              <a class="button secondary" href="<?= $user ? 'index.php?page=compose' : 'index.php?page=login' ?>">开始发布</a>
+            </article>
+          <?php endif; ?>
+          <?php foreach ($threads as $thread): ?>
+            <article class="thread-card">
+              <a class="chip" style="--chip: <?= e($thread['category_color']) ?>" href="index.php?category=<?= (int) $thread['category_id'] ?>"><?= e($thread['category_name']) ?></a>
+              <h3><a href="index.php?page=thread&id=<?= (int) $thread['id'] ?>"><?= e($thread['title']) ?></a></h3>
+              <p><?= e(mb_substr(strip_tags($thread['content']), 0, 140)) ?><?= mb_strlen($thread['content']) > 140 ? '...' : '' ?></p>
+              <footer>
+                <span><?= e($thread['display_name']) ?></span>
+                <span><?= e(time_ago($thread['last_activity_at'])) ?></span>
+                <span><?= (int) $thread['reply_count'] ?> 回复</span>
+              </footer>
+            </article>
+          <?php endforeach; ?>
+        </section>
+      </section>
+
+      <section class="feature-band">
+        <div>
+          <p class="eyebrow dark">Built for operators</p>
+          <h2>从部署到移动端，都保持轻。</h2>
+        </div>
+        <ul>
+          <li><strong>共享主机友好</strong><span>没有 Composer、队列、Node 构建或复杂环境变量。</span></li>
+          <li><strong>安装后即运营</strong><span>默认分类、管理员、站点文案和安全锁一次创建。</span></li>
+          <li><strong>移动端可接入</strong><span>iForum-iOS 模板读取同一个 `api.php`，部署后只改 API 地址。</span></li>
+        </ul>
       </section>
     </main>
   <?php endif; ?>
@@ -442,4 +491,3 @@ $flash = flash();
   </footer>
 </body>
 </html>
-

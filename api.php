@@ -184,9 +184,9 @@ try {
             json_response([
                 'site' => [
                     'name' => setting('site_name', config_value($config, 'site.name', 'iForum')),
-                    'tagline' => setting('tagline', 'A clean community forum template.'),
-                    'welcomeTitle' => setting('welcome_title', '欢迎来到 iForum'),
-                    'welcomeBody' => setting('welcome_body', '一个干净的通用论坛模板。'),
+                    'tagline' => setting('tagline', '现代、轻量、可直接部署的 PHP 论坛。'),
+                    'welcomeTitle' => setting('welcome_title', '让社区论坛像博客程序一样好安装。'),
+                    'welcomeBody' => setting('welcome_body', 'iForum 面向普通 PHP 空间：上传 zip、填写数据库、创建管理员，然后直接开始运营。'),
                 ],
                 'user' => ($user = api_user()) ? public_user($user) : null,
             ]);

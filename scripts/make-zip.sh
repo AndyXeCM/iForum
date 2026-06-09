@@ -11,6 +11,7 @@ rm -f "$DIST_DIR/$ZIP_NAME"
 cd "$ROOT_DIR"
 zip -r "$DIST_DIR/$ZIP_NAME" . \
   -x "dist/*" \
+  -x "packages/*" \
   -x ".git/*" \
   -x "app/config.php" \
   -x "app/installed.lock" \
@@ -19,4 +20,3 @@ zip -r "$DIST_DIR/$ZIP_NAME" . \
   -x "*.log"
 
 echo "Created $DIST_DIR/$ZIP_NAME"
-

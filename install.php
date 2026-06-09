@@ -127,9 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $settings = [
                 'site_name' => $siteName,
-                'tagline' => 'A clean community forum template.',
-                'welcome_title' => '欢迎来到 ' . $siteName,
-                'welcome_body' => '这是一个没有机构定制内容的通用论坛模板。安装完成后，你可以在后台调整分类并开始发帖。',
+                'tagline' => '现代、轻量、可直接部署的 PHP 论坛。',
+                'welcome_title' => '让社区论坛像博客程序一样好安装。',
+                'welcome_body' => 'iForum 面向普通 PHP 空间：上传 zip、填写数据库、创建管理员，然后直接开始运营。',
             ];
             $settingsStmt = $pdo->prepare("INSERT INTO `{$prefix}settings` (`key`, `value`, `created_at`, `updated_at`) VALUES (?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = NOW()");
             foreach ($settings as $key => $value) {
@@ -137,10 +137,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $categories = [
-                ['general', '综合讨论', '日常交流、公告和公共话题。', '#2563eb', 1],
-                ['questions', '问答求助', '提出问题，收集经验和答案。', '#16a34a', 2],
-                ['showcase', '作品展示', '分享项目、作品、文章和灵感。', '#d97706', 3],
-                ['feedback', '站务反馈', '关于社区规则、功能和运营的建议。', '#7c3aed', 4],
+                ['announcements', '公告与更新', '发布产品、社区和运营相关的重要消息。', '#2563eb', 1],
+                ['questions', '问答互助', '提出问题，沉淀可复用的经验和答案。', '#0f8a4b', 2],
+                ['showcase', '作品展示', '分享项目、文章、资源和社区成员成果。', '#d97706', 3],
+                ['feedback', '反馈建议', '收集功能建议、使用体验和治理讨论。', '#7c3aed', 4],
             ];
             $categoryStmt = $pdo->prepare("INSERT INTO `{$prefix}categories` (`slug`, `name`, `description`, `color`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW()) ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `description` = VALUES(`description`), `color` = VALUES(`color`), `sort_order` = VALUES(`sort_order`), `is_active` = 1");
             foreach ($categories as $category) {
@@ -195,9 +195,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="install-page">
   <main class="install-shell">
     <section class="install-hero">
-      <p class="eyebrow">iForum Installer</p>
-      <h1>把论坛部署到普通 PHP 空间。</h1>
-      <p>填写数据库和管理员信息，安装器会自动建表、写入配置并锁定安装入口。</p>
+      <div>
+        <p class="eyebrow">iForum 1.0 Installer</p>
+        <h1>像安装 Typecho 一样安装现代论坛。</h1>
+        <p>上传 zip、填写数据库、创建管理员。iForum 会自动建表、写入配置、初始化分类，并锁定安装入口。</p>
+      </div>
+      <div class="install-checklist">
+        <span>PHP 8.1+</span>
+        <span>PDO MySQL</span>
+        <span>无 Composer</span>
+        <span>JSON API ready</span>
+      </div>
     </section>
 
     <?php if ($success): ?>
@@ -216,6 +224,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php endif; ?>
 
       <form method="post" class="panel install-form">
+        <div class="install-step">
+          <strong>1</strong>
+          <span>站点信息</span>
+        </div>
         <div class="form-grid">
           <label>
             <span>站点名称</span>
@@ -227,7 +239,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </label>
         </div>
 
-        <h2>数据库</h2>
+        <div class="install-step">
+          <strong>2</strong>
+          <span>数据库连接</span>
+        </div>
         <div class="form-grid">
           <label>
             <span>数据库主机</span>
@@ -259,7 +274,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <span>如果数据库不存在，尝试自动创建</span>
         </label>
 
-        <h2>管理员</h2>
+        <div class="install-step">
+          <strong>3</strong>
+          <span>管理员账号</span>
+        </div>
         <div class="form-grid">
           <label>
             <span>用户名</span>
